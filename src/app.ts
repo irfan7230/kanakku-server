@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import shopRoutes from './routes/shopRoutes';
-import productRoutes from './routes/productRoutes';
+
 import transactionRoutes from './routes/transactionRoutes';
 import userRoutes from './routes/userRoutes';
 import analyticsRoutes from './routes/analyticsRoutes';
@@ -46,7 +46,7 @@ app.get('/', (req: Request, res: Response) => {
 
 // Mount Routes
 app.use('/api/shops', shopRoutes);
-app.use('/api/products', productRoutes);
+
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/profile', userRoutes);
 app.use('/api/analytics', analyticsRoutes);

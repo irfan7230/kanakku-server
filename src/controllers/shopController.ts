@@ -114,28 +114,35 @@ export const deleteShop = async (req: Request, res: Response) => {
             return res.status(403).json({ error: 'Unauthorized' });
         }
 
-        const batch = db.batch();
-        batch.update(shopRef, { isActive: false });
+        // Batch has a limit of 500 operations. We need to handle this.
+        const BATCH_SIZE = 500;
+        let batch = db.batch();
+        let operationCount = 0;
 
-        // Delete all products for this shop
-        const productsSnapshot = await db.collection('products')
-            .where('shopId', '==', id)
-            .where('userId', '==', userId)
-            .get();
-        productsSnapshot.forEach(doc => {
-            batch.update(doc.ref, { isActive: false });
-        });
+        batch.update(shopRef, { isActive: false });
+        operationCount++;
 
         // Delete all transactions for this shop
         const transactionsSnapshot = await db.collection('transactions')
             .where('shopId', '==', id)
             .where('userId', '==', userId)
             .get();
-        transactionsSnapshot.forEach(doc => {
-            batch.update(doc.ref, { isActive: false });
-        });
 
-        await batch.commit();
+        for (const doc of transactionsSnapshot.docs) {
+            batch.update(doc.ref, { isActive: false });
+            operationCount++;
+
+            if (operationCount >= BATCH_SIZE) {
+                await batch.commit();
+                batch = db.batch();
+                operationCount = 0;
+            }
+        }
+
+        if (operationCount > 0) {
+            await batch.commit();
+        }
+
         res.status(200).json({ message: 'Shop and all related data deleted successfully' });
     } catch (error) {
         console.error('Error deleting shop:', error);

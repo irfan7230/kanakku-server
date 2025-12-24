@@ -19,18 +19,7 @@ export interface WholesaleShop {
     createdAt: string;
 }
 
-export interface Product {
-    id?: string;
-    shopId: string;
-    userId: string;
-    name: string;
-    price: number;
-    quantity: number;
-    imagePath?: string;
-    purchasedAt: string;
-    isActive: boolean;
-    createdAt: string;
-}
+
 
 export interface Transaction {
     id?: string;
@@ -40,7 +29,6 @@ export interface Transaction {
     type: 'purchase' | 'payment';
     date: string;
     note?: string;
-    relatedProductId?: string;
     isActive: boolean;
     createdAt: string;
 }

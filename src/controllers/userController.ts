@@ -54,3 +54,53 @@ export const updateProfile = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+export const resetUserData = async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.uid;
+        if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+        const BATCH_SIZE = 500;
+        let batch = db.batch();
+        let operationCount = 0;
+
+        // 1. Hard Delete Shops
+        const shopsSnapshot = await db.collection('shops')
+            .where('userId', '==', userId)
+            .get();
+
+        for (const doc of shopsSnapshot.docs) {
+            batch.delete(doc.ref);
+            operationCount++;
+            if (operationCount >= BATCH_SIZE) {
+                await batch.commit();
+                batch = db.batch();
+                operationCount = 0;
+            }
+        }
+
+        // 2. Hard Delete Transactions
+        const transactionsSnapshot = await db.collection('transactions')
+            .where('userId', '==', userId)
+            .get();
+
+        for (const doc of transactionsSnapshot.docs) {
+            batch.delete(doc.ref);
+            operationCount++;
+            if (operationCount >= BATCH_SIZE) {
+                await batch.commit();
+                batch = db.batch();
+                operationCount = 0;
+            }
+        }
+
+        if (operationCount > 0) {
+            await batch.commit();
+        }
+
+        res.status(200).json({ message: 'All user data has been reset successfully' });
+    } catch (error) {
+        console.error('Error resetting user data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};

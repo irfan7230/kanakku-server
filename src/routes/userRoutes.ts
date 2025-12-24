@@ -6,5 +6,6 @@ const router = express.Router();
 router.use(verifyToken);
 router.get('/', userController.getProfile);
 router.put('/', userController.updateProfile);
+router.delete('/reset', userController.resetUserData);
 
 export default router;

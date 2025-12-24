@@ -6,7 +6,7 @@ const collectionName = 'transactions';
 
 export const createTransaction = async (req: Request, res: Response) => {
     try {
-        const { shopId, amount, type, date, note, relatedProductId } = req.body;
+        const { shopId, amount, type, date, note } = req.body;
         const userId = req.user?.uid;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -26,7 +26,6 @@ export const createTransaction = async (req: Request, res: Response) => {
             type: type,
             date: date || new Date().toISOString(),
             note: note || '',
-            relatedProductId: relatedProductId || undefined,
             isActive: true,
             createdAt: new Date().toISOString(),
         };
