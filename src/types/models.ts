@@ -31,4 +31,10 @@ export interface Transaction {
     note?: string;
     isActive: boolean;
     createdAt: string;
+    // Record-wise payment fields
+    relatedTransactionIds?: string[];
+    paidAmount?: number;
+    isSettled?: boolean;
+    status?: 'pending' | 'completed' | 'cancelled';
+    billUrl?: string;
 }

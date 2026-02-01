@@ -6,7 +6,7 @@ const collectionName = 'transactions';
 
 export const createTransaction = async (req: Request, res: Response) => {
     try {
-        const { shopId, amount, type, date, note } = req.body;
+        const { shopId, amount, type, date, note, relatedTransactionIds, paidAmount, isSettled, status, billUrl } = req.body;
         const userId = req.user?.uid;
         if (!userId) return res.status(401).json({ error: 'Unauthorized' });
 
@@ -28,6 +28,12 @@ export const createTransaction = async (req: Request, res: Response) => {
             note: note || '',
             isActive: true,
             createdAt: new Date().toISOString(),
+            // New fields
+            relatedTransactionIds: relatedTransactionIds || [],
+            paidAmount: paidAmount ? Number(paidAmount) : 0,
+            isSettled: isSettled || false,
+            status: status || 'completed', // Default to completed for backward compatibility? Or pending? Frontend sends explicit.
+            billUrl: billUrl || undefined,
         };
 
         if (req.body.id) {
